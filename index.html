@@ -1,0 +1,504 @@
+ <!DOCTYPE html>
+<html lang="sk">
+<head>
+  <!-- Primary Meta Tags -->
+  <title>Mňaukíza</title>
+  <meta name="description" content="Mňaukíza – mačacia kaviareň na Mostnej ulici v Nitre. Oddýchnite si v spoločnosti mačičiek, pri dobrej káve a koláčiku.">
+
+  <!-- SEO Keywords -->
+  <meta name="keywords" content="mačacia kaviareň Nitra, Mňaukíza, káva s mačkami, kaviareň Mostná Nitra, oddych s mačkami, koláče, latte art">
+
+  <!-- Author -->
+  <meta name="author" content="Mňaukíza">
+  <meta property="og:image" content="logo.jpg">
+  <!-- Social -->
+  <meta property="og:title" content="Mňaukíza - Mačacia kaviareň v Nitre" />
+  <meta property="og:description" content="Navštívte mačaciu kaviareň Mňaukíza v Nitre. Oddych, dobrá káva a spoločnosť chlpatých kamarátov." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.mnaukiza.sk" />
+
+  <link rel="icon" href="logo.jpg" type="image/jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // === Mobile menu toggle ===
+  const menuToggle = document.getElementById("mobile-menu");
+  const navLinks = document.querySelector(".nav-links");
+  menuToggle.addEventListener("click", () => {
+    navLinks.classList.toggle("show");
+  });
+
+  // === Contact form ===
+  const form = document.getElementById("contact-form");
+  const submitBtn = document.getElementById("contact-submit");
+  const successMsg = document.getElementById("form-success");
+
+  form?.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Odosiela sa...";
+
+    const formData = new FormData(form);
+
+    fetch("https://formspree.io/f/mkgbvjza", {
+      method: "POST",
+      body: formData,
+      headers: { 'Accept': 'application/json' }
+    })
+    .then(response => {
+      if (response.ok) {
+        form.reset();
+        form.style.display = "none";
+        successMsg.style.display = "block";
+      } else {
+        alert("Chyba pri odosielaní. Skúste to znova.");
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Odoslať správu";
+      }
+    })
+    .catch(() => {
+      alert("Chyba siete. Skúste znova neskôr.");
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Odoslať správu";
+    });
+  });
+
+  // === Like feature in gallery ===
+  const galleryItems = document.querySelectorAll(".gallery-item.likeable, .insta-grid img");
+
+galleryItems.forEach((item, index) => {
+  // Create emoji bar if it doesn't exist
+  let emojiBar = item.querySelector?.(".emoji-bar");
+
+  // For Instagram images, wrap them dynamically
+  if (!emojiBar && item.tagName === "IMG") {
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("gallery-item", "likeable");
+    wrapper.dataset.image = item.src.split('/').pop(); // use filename as ID
+
+    // Create emoji bar
+    emojiBar = document.createElement("div");
+    emojiBar.classList.add("emoji-bar", "hidden");
+    ["❤️", "👍", "😍", "☕"].forEach(emojiChar => {
+      const emoji = document.createElement("span");
+      emoji.classList.add("emoji");
+      emoji.textContent = emojiChar;
+      emojiBar.appendChild(emoji);
+    });
+
+    // Replace image with wrapper
+    item.parentNode.insertBefore(wrapper, item);
+    wrapper.appendChild(item);
+    wrapper.appendChild(emojiBar);
+    item = wrapper; // continue logic with wrapper
+  }
+
+  item.addEventListener("click", () => {
+    emojiBar.classList.toggle("hidden");
+  });
+
+  const emojis = emojiBar.querySelectorAll(".emoji");
+  emojis.forEach(emoji => {
+    emoji.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const selectedEmoji = emoji.textContent;
+      const imageId = item.dataset.image;
+
+      fetch("https://formspree.io/f/mldnwqbl", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          emoji: selectedEmoji,
+          image: imageId
+        })
+      }).then(() => {
+        emojiBar.innerHTML = `<span class="reaction-thankyou">Ďakujeme za reakciu! ${selectedEmoji}</span>`;
+      }).catch(() => {
+        alert("Nepodarilo sa odoslať reakciu.");
+      });
+    });
+  });
+});
+
+
+  galleryItems.forEach((item) => {
+    const emojiBar = item.querySelector(".emoji-bar");
+
+    item.addEventListener("click", () => {
+      emojiBar.classList.toggle("hidden");
+    });
+
+    const emojis = emojiBar.querySelectorAll(".emoji");
+    emojis.forEach(emoji => {
+      emoji.addEventListener("click", (e) => {
+        e.stopPropagation();
+
+        const selectedEmoji = emoji.textContent;
+        const imageId = item.dataset.image;
+
+        fetch("https://formspree.io/f/mldnwqbl", {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            emoji: selectedEmoji,
+            image: imageId
+          })
+        }).then(() => {
+          emojiBar.innerHTML = `<span class="reaction-thankyou">Ďakujeme za reakciu! ${selectedEmoji}</span>`;
+        }).catch(() => {
+          alert("Nepodarilo sa odoslať reakciu.");
+        });
+      });
+    });
+  });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const stars = document.querySelectorAll('.star');
+  const thankYouMsg = document.querySelector('#thankYouMessage');
+  const googleReviewLink = "https://www.google.com/maps/place/M%C5%88auk%C3%ADza+ma%C4%8Dacia+kaviare%C5%88/@48.3157916,18.0908721,3a,75y/data=!3m8!1e2!3m6!1sCIHM0ogKEICAgID_7azn9AE!2e10!3e12!6shttps:%2F%2Flh3.googleusercontent.com%2Fgeougc-cs%2FAB3l90BLHuJvpTwGlcXyremfxEI4SlRU7GimMcrq7amO_KaCcF_cD6thZby7IYa-fZR7AKf_xb0npYfLEYVmmq4Dfj5iW7q6rec16z-5Xt_GTf53R8pCDv7LVWd50CtKebgY8iP8T1Nz4g!7i4624!8i3468!4m19!1m10!3m9!1s0x476b3fcb22e80dad:0xecab8145ee757cb2!2zTcWIYXVrw616YSBtYcSNYWNpYSBrYXZpYXJlxYg!8m2!3d48.3157916!4d18.0908721!10e5!14m1!1BCgIgAQ!16s%2Fg%2F11y3mdztk8!3m7!1s0x476b3fcb22e80dad:0xecab8145ee757cb2!8m2!3d48.3157916!4d18.0908721!9m1!1b1!16s%2Fg%2F11y3mdztk8?entry=ttu&g_ep=EgoyMDI1MDYyMi4wIKXMDSoASAFQAw%3D%3D";
+  
+  let selectedRating = 0;
+  thankYouMsg.classList.remove('visible'); // Hide message on page load
+
+  function updateStars(hoverIndex = null) {
+    stars.forEach((star, index) => {
+      star.classList.remove('hovered', 'selected');
+      if (hoverIndex !== null && index <= hoverIndex) {
+        star.classList.add('hovered');
+      } else if (selectedRating !== 0 && index < selectedRating) {
+        star.classList.add('selected');
+      }
+    });
+  }
+
+  async function sendRatingToFormspree(rating) {
+    try {
+      const response = await fetch("https://formspree.io/f/mvgrwjkb", {
+        method: "POST",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ rating: rating })
+      });
+
+      if (response.ok) {
+        thankYouMsg.classList.add('visible');  // Show thank you message here
+      } else {
+        alert("Chyba pri odosielaní hodnotenia.");
+      }
+    } catch (error) {
+      alert("Chyba pri odosielaní hodnotenia.");
+    }
+  }
+
+  stars.forEach((star, index) => {
+    star.addEventListener('mouseenter', () => {
+      updateStars(index);
+    });
+
+    star.addEventListener('mouseleave', () => {
+      updateStars(null);
+    });
+
+    star.addEventListener('click', () => {
+      selectedRating = index + 1;
+      updateStars(null);
+
+      thankYouMsg.classList.remove('visible'); // Hide any previous message on new click
+
+      if (selectedRating === 5) {
+        window.open(googleReviewLink, '_blank');
+      } else {
+        sendRatingToFormspree(selectedRating);
+      }
+    });
+  });
+});
+
+</script>
+
+
+<body>
+  <header class="main-header">
+    <div class="container nav-container">
+      <a href="index.html#about"><img src="logo.jpg" alt="Kávaprevšetkých logo" class="logo" /></a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#about">O nás</a></li>
+          <li><a href="menu.html">Menu</a></li>
+          <li><a href="#gallery">Galéria</a></li>
+          <li><a href="#reviews">Recenzie</a></li>
+          <li><a href="podujatia.html">Podujatia</a></li>
+          <li><a href="kontakt.html">Kontakt</a></li>
+          <li><a href="macky.html">Naše mačičky</a></li>
+        </ul>
+      </nav>
+      <button class="menu-toggle" id="mobile-menu">&#9776;</button>
+    </div>
+  </header>
+
+  <!-- HERO sekcia -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Mňaukíza</h1>
+      <p>Mačacia kaviareň v Nitre. Príčulné prostredie, domáce koláče a spokojne pradúci spoločníci.</p>
+      <div class="hero-buttons">
+        <a href="menu.html" class="btn">Pozrieť Menu</a>
+        <a href="macky.html" class="btn">Naše mačky</a>
+      </div>
+    </div>
+    <div class="hero-bg"></div>
+  </section>
+      
+   
+
+  <!-- O NÁS sekcia -->
+  <section id="about" class="section about">
+    <div class="container animated-section">
+      <h2>O nás</h2>
+      <p>Sme Mňaukíza – miesto, kde sa stretá láska ku káve s láskou k mačkám. V našej mačacej kaviarni v srdci Nitry na Mostnej ulici nájdete oddych, smiech aj jemné praděnie. Príďte si posedieť, dať si kávu a nechajte sa obklopiť chlpatými kamarátmi.</p>
+      <div class="about-visuals">
+        <img src="macka.jpg.png" alt="Mačka v kaviarni" class="about-img" />
+        <img src="macka2.jpg.png" alt="Interiér mačacej kaviarne" class="about-img" />
+      </div>
+    </div>
+  </section>
+
+  <!-- GALÉRIA -->
+  <section id="gallery" class="section gallery">
+    <div class="container">
+      <h2>Galéria</h2>
+      <div class="like-feature-announcement">
+        🐾 Novinka: Môžete označiť, ktorá mačička či fotka sa vám páči! Kliknite na fotku a zanechajte emóciu! 😻
+      </div>
+      <div class="gallery-grid advanced-gallery">
+        <div class="gallery-item likeable" data-image="macka.jpg.png">
+          <img src="macka.jpg.png" alt="Mačka oddychuje" />
+          <div class="emoji-bar">
+            <span class="emoji">❤️</span>
+            <span class="emoji">👍</span>
+            <span class="emoji">😍</span>
+            <span class="emoji">☕</span>
+          </div>
+          <div class="default-like">❤️</div>
+        </div>
+
+         <div class="gallery-item likeable" data-image="macka.jpg.png">
+          <img src="macka2.jpg.png" alt="Mačka oddychuje" />
+          <div class="emoji-bar">
+            <span class="emoji">❤️</span>
+            <span class="emoji">👍</span>
+            <span class="emoji">😍</span>
+            <span class="emoji">☕</span>
+          </div>
+          
+        </div>
+
+         <div class="gallery-item likeable" data-image="macka.jpg.png">
+          <img src="macka3.jpg.png" alt="Mačka oddychuje" />
+          <div class="emoji-bar">
+            <span class="emoji">❤️</span>
+            <span class="emoji">👍</span>
+            <span class="emoji">😍</span>
+            <span class="emoji">☕</span>
+          </div>
+          
+        </div>
+
+         <div class="gallery-item likeable" data-image="macka.jpg.png">
+          <img src="macka4.jpg.png" alt="Mačka oddychuje" />
+          <div class="emoji-bar">
+            <span class="emoji">❤️</span>
+            <span class="emoji">👍</span>
+            <span class="emoji">😍</span>
+            <span class="emoji">☕</span>
+          </div>
+         
+        </div>
+
+         <div class="gallery-item likeable" data-image="macka.jpg.png">
+          <img src="macka5.jpg.png" alt="Mačka oddychuje" />
+          <div class="emoji-bar">
+            <span class="emoji">❤️</span>
+            <span class="emoji">👍</span>
+            <span class="emoji">😍</span>
+            <span class="emoji">☕</span>
+          </div>
+          <div class="default-like">❤️</div>
+        </div>
+
+         <div class="gallery-item likeable" data-image="macka.jpg.png">
+          <img src="macka6.jpg.png" alt="Mačka oddychuje" />
+          <div class="emoji-bar">
+            <span class="emoji">❤️</span>
+            <span class="emoji">👍</span>
+            <span class="emoji">😍</span>
+            <span class="emoji">☕</span>
+          </div>
+          
+        </div>
+        <!-- Pokračuj s macka2.jpg.png ... macka6.jpg.png rovnako -->
+      </div>
+    </div>
+  </section>
+
+<section id="reviews" class="section reviews">
+    <div class="container">
+      <h2>Pradenie spokojnosti</h2>
+      <div class="review-grid">
+        <blockquote>
+          „Zaujímavé miesto na návštevu kto nemá problém že mačky sú prísediacie pri vašom stole😊"
+          <br /><span>- Peter J.</span>
+        </blockquote>
+        <blockquote>
+          „Super atmosféra, mačičky sú veľmi dobre socializované a extrovertné čo bolo prekvapením oproti iným kaviarňam tohto typu."
+          <br /><span>- Veronika</span>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+ <!-- EVENTS -->
+  <section id="events" class="section events">
+    <div class="container">
+      <h2>Podujatia & Mačacie stretnutia</h2>
+      <div class="event-preview">
+        <h3>Večer s mačkami & koláčmi</h3>
+        <p><strong>Dátum:</strong> 12. júl 2025<br>
+        <strong>Miesto:</strong> Mňaukíza, Mostná ulica, Nitra<br>
+        <strong>Popis:</strong> Večer plný sladkostí, pradenia a pohodovej atmosféry. Prídite si oddýchnuť medzi naše mačičky.</p>
+        <a href="podujatia.html" class="btn-outline">Zobraziť všetky podujatia</a>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="section extra-info">
+  <div class="container">
+    <h2>Ďalšie informácie</h2>
+    <div class="info-grid">
+      <div class="info-card">
+        <h3>Parkovanie</h3>
+        <p>Parkovanie je dostupné priamo na <strong>Mostnej ulici</strong> alebo v okolí <strong>Podzámskej</strong> alebo za <strong>Divadlom Andreja Bagara</strong>.</p>
+      </div>
+      <div class="info-card">
+        <h3>Mačací salónik</h3>
+        <p>Vychutnajte si kávu v spoločnosti našich mačiek. Relax, pradenie a pohoda zaručené. 🐾</p>
+      </div>
+      <div class="info-card">
+        <h3>Naše mačky</h3>
+        <p>Zoznam našich spoločníkov, ktorý vás budú pri pobyte pozorovať si môžete pozrieť tu - <a href="macky.html">Naše mačky</a></p>
+      </div>
+      <div class="info-card">
+        <h3>Podujatia a workshopy</h3>
+        <p>Pravidelne organizujeme workshopy o káve, chovateľské stretnutia aj čítania kníh s mačkami. Sledujte <a href="podujatia.html">podujatia</a> pre viac.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  <section class="section instagram-gallery">
+  <div class="container">
+    <h2>Instagram Galéria</h2>
+    <div class="like-feature-announcement">
+      📸 Sledujte naše mačky a kávové momenty! Kliknite na obrázok a zanechajte reakciu. 🐱☕
+    </div>
+    <p class="text-center">
+      Sledujte nás na 
+      <a href="https://www.instagram.com/mnaukiza/" target="_blank">@mnaukiza</a> 
+      pre viac roztomilých mačiek a kávičkových zážitkov!
+    </p>
+    <div class="insta-grid">
+      <img src="instagram1.jpg" alt="Mačka v kaviarni Mňaukíza" />
+      <img src="instagram2.jpg" alt="Káva a mačka" />
+      <img src="instagram3.jpg" alt="Oddych v Mňaukíza" />
+      <img src="instagram4.jpg" alt="Interiér Mňaukíza s mačkami" />
+      <img src="instagram5.jpg" alt="Hostia s mačkami" />
+      <img src="instagram6.jpg" alt="Latte art a mačací spoločník" />
+    </div>
+  </div>
+</section>
+
+
+ <!-- KONTAKT a hodnotenie ostáva, len zmeníme adresu + meno -->
+  <section id="contact" class="section contact">
+    <div class="container">
+      <h2>Kontakt</h2>
+      <p><strong>Adresa:</strong> Mostná 224/26, Nitra</p>
+      <p><strong>Email:</strong> <a href="mailto:kontakt@mnaukiza.sk">kontakt@mnaukiza.sk</a></p>
+      <p><strong>Tel:</strong> <a href="tel:+421901717111">
+0940 906 961</a></p>
+      <p><strong>Otváracie hodiny:</strong><br>
+        Po - Pi 11:00 - 19:00<br>
+       So - Ne 14:00 - 20:00<br>
+  
+      </p>
+       <form class="contact-form" id="contact-form">
+  <input type="text" name="meno" placeholder="Meno" required>
+  <input type="email" name="email" placeholder="Email" required>
+  <textarea name="sprava" placeholder="Vaša správa" rows="4" required></textarea>
+  <button type="submit" id="contact-submit">Odoslať správu</button>
+</form>
+    </div>
+
+     <div class="socials">
+  <a href="https://www.facebook.com/p/M%C5%88auk%C3%ADza-100093073656049/?locale=sk_SK" target="_blank" aria-label="Facebook">
+    <i class="fab fa-facebook-f"></i>
+  </a>
+  <a href="https://www.instagram.com/mnaukiza/" target="_blank" aria-label="Instagram">
+    <i class="fab fa-instagram"></i>
+  </a>
+</div>
+  </section>
+
+
+
+<div id="form-success" style="display: none; color: green; text-align: center; margin-top: 20px; font-weight: bold;">
+  ✅ Ďakujeme! Vaša správa bola odoslaná.
+</div>
+
+<div class="rating-widget">
+  <h3 class="rating-title">Ohodnoťte nás</h3>
+  <form id="ratingForm" action="https://formspree.io/f/mvgrwjkb" method="POST">
+  <div class="star-rating">
+    <input type="hidden" name="rating" id="starValue" />
+    <span class="star" data-value="1">&#9733;</span>
+    <span class="star" data-value="2">&#9733;</span>
+    <span class="star" data-value="3">&#9733;</span>
+    <span class="star" data-value="4">&#9733;</span>
+    <span class="star" data-value="5">&#9733;</span>
+  </div>
+</form>
+
+<p id="thankYouMessage">Ďakujeme za spätnú väzbu!</p>
+
+</div>
+
+
+
+
+
+
+
+
+
+  <footer>
+    <p>&copy; 2025 Mňaukíza – Mačacia kaviareň v Nitre. Všetky práva vyhradené.</p>
+    <p style="font-size: 0.85rem; color: #d9fbee;">Vyrobené s ❤️ a mačičkami | Webdesign by Maxim Mlynek</p>
+  </footer>
+</body>
+</html>
